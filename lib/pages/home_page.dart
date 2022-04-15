@@ -98,11 +98,11 @@ class _HomePageState extends State<HomePage> {
                         shrinkWrap: true,
                         children: [
                           preview,
-                          small_thumb,
-                          large_thumb,
-                          huge_thumb,
-                          preview_1000,
-                          preview_1500
+                          smallthumb,
+                          largethumb,
+                          hugethumb,
+                          preview1000,
+                          preview1500
                         ]
                             .map((e) => InkWell(
                                   onTap: () {

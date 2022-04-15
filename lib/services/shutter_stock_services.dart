@@ -222,23 +222,23 @@ class ShutterStockServices with ChangeNotifier {
         showPreviewImages(data);
 
         break;
-      case small_thumb:
+      case smallthumb:
         showSmallThumbImages(data);
 
         break;
-      case large_thumb:
+      case largethumb:
         showLargeThumbImages(data);
 
         break;
-      case huge_thumb:
+      case hugethumb:
         showHugeThumbImages(data);
 
         break;
-      case preview_1000:
+      case preview1000:
         showPreview1000Images(data);
 
         break;
-      case preview_1500:
+      case preview1500:
         showPreview1500Images(data);
 
         break;
