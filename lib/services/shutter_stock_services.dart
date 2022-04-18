@@ -9,48 +9,22 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:shutter_stock/constants/api.dart';
+import 'package:shutter_stock/helpers/image_selector_helper.dart';
 import 'package:shutter_stock/models/shutter_stock_model.dart';
 
 import '../constants/variables.dart';
-// import 'package:shutter_stock/model/shutter_stock_model.dart';
 
 class ShutterStockServices with ChangeNotifier {
-  // static dynamic _resp;
-  //
-  // dynamic get resp =>_resp;
-  //
-  //
-  //  Future<ShutterStockModel> fetchApi() async {
-  //   final response = await http.get(
-  //     Uri.parse(Api.baseUrl + Api.shutterStockImages),
-  //     // Send authorization headers to the backend.
-  //     headers: {HttpHeaders.authorizationHeader: Api.tokenKey},
-  //   );
-  //   var responseJson = await json.decode(response.body);
-  //   if(response.statusCode == 200){
-  //     _resp = ShutterStockModel.fromJson(responseJson);
-  //   }
-  //   else{
-  //     _resp = ShutterStockModel.fromJson(responseJson);
-  //   }
-  //
-  //   notifyListeners();
-  //   return _resp;
-  //   // final List<ShutterStockModel> list = <ShutterStockModel>[];
-  //   // List<dynamic> mapData = responseJson["data"];
-  //
-  //   // mapData.forEach(( dynamic element) {
-  //   //   list.add(ShutterStockModel.fromJson(element));
-  //   // });
-  //
-  //   // return list;
-  //   // ["data"][0]["assets"]["preview"]["url"].toString();
-  // }
-
   final RefreshController refreshController =
       RefreshController(initialRefresh: true);
   List<Data> _items = [];
-  Map<dynamic, dynamic> data = {};
+  Map<dynamic, dynamic> _data = {};
+
+  Map<dynamic, dynamic> get data => _data;
+
+  set setDataToCurrentData(Map<dynamic, dynamic> newData) {
+    _data = newData;
+  }
 
   int _currentPage = 3;
   dynamic _currentResponse;
@@ -65,28 +39,38 @@ class ShutterStockServices with ChangeNotifier {
 
   dynamic get currentResponse => _currentResponse;
 
-  Box? box;
-
   Future openBox() async {
     var dir = await getApplicationDocumentsDirectory();
     Hive.init(dir.path);
-    box = await Hive.openBox('data');
+    FromHiveDataBase.box = await Hive.openBox('data');
     return;
   }
 
   Future<bool> fetchApi(
-      {bool isRefresh = false, selectedImage = "preview"}) async {
+      {bool isLoading = false,
+      bool isRefresh = false,
+      bool isSelected = false,
+      selectedImage = "preview"}) async {
+    // _currentPage = 3;
+    // print("6");
     await openBox();
+    if (isSelected) {
+      _currentPage = 3;
+    }
     if (isRefresh) {
+      // print("7");
       _currentPage = 3;
     } else {
+      // print("8");
       if (_currentPage >= _totalPage) {
+        // print("9");
         refreshController.loadNoData();
         return _load;
       }
     }
 
     try {
+      // print("10");
       final response = await http.get(
         Uri.parse(Api.baseUrl +
             Api.shutterStockImages +
@@ -95,22 +79,32 @@ class ShutterStockServices with ChangeNotifier {
         // Send authorization headers to the backend.
         headers: {HttpHeaders.authorizationHeader: Api.tokenKey},
       );
+      // print("11");
+      // print(response.statusCode);
+      if (response.statusCode == 429) {
+        // print("too many request");
+      }
       if (response.statusCode == 200) {
+        // print("12");
         var responseJs = await json.decode(response.body);
         final responseJson = ShutterStockModel.fromJson(responseJs);
         _currentResponse = responseJson;
+        // print("13");
         await putData(responseJson.data!, selectedImage);
+        // print("14");
         if (isRefresh) {
+          // print("15");
           _items = responseJson.data!;
         } else {
+          // print("16");
           items.clear();
           items.addAll(responseJson.data!);
           await putData(responseJson.data!, selectedImage);
+          // print("17");
         }
-        _currentPage += 4;
-        // notifyListeners();
-
-        // return true;
+        if (isLoading) {
+          _currentPage += 4;
+        }
       } else {
         return false;
       }
@@ -118,155 +112,49 @@ class ShutterStockServices with ChangeNotifier {
       Center(
         child: Text(socketException.toString()),
       );
-      // print("No internet");
     }
-    // print("404040 : ");
-    // print(box!.toMap());
-    var myMap = box!.toMap();
-    // print(myMap);
+    var myMap = FromHiveDataBase.box!.toMap();
     if (myMap.isEmpty) {
       data["empty"] = "empty";
-      // notifyListeners();
     } else {
-      data = myMap;
-      // notifyListeners();
+      // print("18");
+      _data = myMap;
+      // print("19");
     }
-    // print(data);
     notifyListeners();
     return true;
   }
 
-  showPreviewImages(List<Data> data) {
-    for (var d in data) {
-      Map<String, dynamic> value = {
-        "url": d.assets!.preview!.url,
-        "height": d.assets!.preview!.height,
-        "width": d.assets!.preview!.width,
-        "description": d.description
-      };
-
-      box!.add(value);
-    }
-  }
-
-  showSmallThumbImages(List<Data> data) {
-    for (var d in data) {
-      Map<String, dynamic> value = {
-        "url": d.assets!.smallThumb!.url,
-        "height": d.assets!.smallThumb!.height,
-        "width": d.assets!.smallThumb!.width,
-        "description": d.description
-      };
-      box!.add(value);
-    }
-  }
-
-  showLargeThumbImages(List<Data> data) {
-    for (var d in data) {
-      Map<String, dynamic> value = {
-        "url": d.assets!.largeThumb!.url,
-        "height": d.assets!.largeThumb!.height,
-        "width": d.assets!.largeThumb!.width,
-        "description": d.description
-      };
-
-      box!.add(value);
-    }
-  }
-
-  showHugeThumbImages(List<Data> data) {
-    for (var d in data) {
-      Map<String, dynamic> value = {
-        "url": d.assets!.hugeThumb!.url,
-        "height": d.assets!.hugeThumb!.height,
-        "width": d.assets!.hugeThumb!.width,
-        "description": d.description
-      };
-
-      box!.add(value);
-    }
-  }
-
-  showPreview1000Images(List<Data> data) {
-    for (var d in data) {
-      // box!.add(d.assets!.preview1500!.url);
-      Map<String, dynamic> value = {
-        "url": d.assets!.preview1000!.url,
-        "height": d.assets!.preview1000!.height,
-        "width": d.assets!.preview1000!.width,
-        "description": d.description
-      };
-
-      box!.add(value);
-    }
-  }
-
-  showPreview1500Images(List<Data> data) {
-    for (var d in data) {
-      Map<String, dynamic> value = {
-        "url": d.assets!.preview1500!.url,
-        "height": d.assets!.preview1500!.height,
-        "width": d.assets!.preview1500!.width,
-        "description": d.description
-      };
-
-      box!.add(value);
-    }
-  }
-
   Future putData(List<Data> data, String selectedImage) async {
-    await box!.clear();
+    await FromHiveDataBase.box!.clear();
 
     switch (selectedImage) {
       case preview:
-        showPreviewImages(data);
+        FromHiveDataBase.showPreviewImages(data);
 
         break;
       case smallthumb:
-        showSmallThumbImages(data);
+        FromHiveDataBase.showSmallThumbImages(data);
 
         break;
       case largethumb:
-        showLargeThumbImages(data);
+        FromHiveDataBase.showLargeThumbImages(data);
 
         break;
       case hugethumb:
-        showHugeThumbImages(data);
+        FromHiveDataBase.showHugeThumbImages(data);
 
         break;
       case preview1000:
-        showPreview1000Images(data);
+        FromHiveDataBase.showPreview1000Images(data);
 
         break;
       case preview1500:
-        showPreview1500Images(data);
+        FromHiveDataBase.showPreview1500Images(data);
 
         break;
       default:
-        showPreviewImages(data);
+        FromHiveDataBase.showPreviewImages(data);
     }
-
-    //   for (var d in data) {
-    //     // box!.add(d.assets!.preview1500!.url);
-    //     Map<String, dynamic> value = {
-
-    //       "url" : d.assets!.preview!.url,
-    //       "height" : d.assets!.preview!.height,
-    //       "width" : d.assets!.preview!.width,
-    //       "description" : d.description
-    //     //   box!.put("height", data[i].assets!.preview!.height),
-    //     //   box!.put("width", data[i].assets!.preview!.width),
-    //     //   // box!.put("width",d.assets!.preview1000!.width);
-    //     //   box!.put("description", data[i].description)
-    //     // });
-
-    //     // count++;
-    //   };
-
-    //     box!.add(
-    //      value
-    //   );
-    //   // print("count : " + count.toString());
-    // }
   }
 }
