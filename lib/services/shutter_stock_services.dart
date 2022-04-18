@@ -82,7 +82,9 @@ class ShutterStockServices with ChangeNotifier {
       // print("11");
       // print(response.statusCode);
       if (response.statusCode == 429) {
+        // 429 == too many requests
         // print("too many request");
+
       }
       if (response.statusCode == 200) {
         // print("12");
@@ -113,12 +115,12 @@ class ShutterStockServices with ChangeNotifier {
         child: Text(socketException.toString()),
       );
     }
-    var myMap = FromHiveDataBase.box!.toMap();
-    if (myMap.isEmpty) {
+    var _toHiveData = FromHiveDataBase.box!.toMap();
+    if (_toHiveData.isEmpty) {
       data["empty"] = "empty";
     } else {
       // print("18");
-      _data = myMap;
+      _data = _toHiveData;
       // print("19");
     }
     notifyListeners();

@@ -1,4 +1,3 @@
-
 const preview = 'preview';
 const smallthumb = "small_thumb";
 const largethumb = "large_thumb";

@@ -5,6 +5,8 @@ import 'package:shutter_stock/notifiers/notifiers.dart';
 import 'package:shutter_stock/services/shutter_stock_services.dart';
 import 'package:shutter_stock/widgets/show_dialog_box.dart';
 
+import '../helpers/helper_function.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -82,8 +84,10 @@ class _HomePageState extends State<HomePage> {
                               child: Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 18.0),
-                                child: myServices.data[index]["description"] ==
-                                        null
+                                child: 
+                                ifItIsNull(myServices, index, "description")
+                                // myServices.data[index]["description"] ==
+                                        // null
                                     ? const Center(
                                         child: CircularProgressIndicator(),
                                       )
@@ -99,7 +103,8 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             SizedBox(
-                              child: myServices.data[index]["url"] == null
+                              child: ifItIsNull(myServices, index, "url")
+                              // myServices.data[index]["url"] == null
                                   ? const Center(
                                       child: CircularProgressIndicator(),
                                     )
@@ -115,7 +120,8 @@ class _HomePageState extends State<HomePage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: [
-                                  myServices.data[index]["height"] == null
+                                  ifItIsNull(myServices, index, "height")
+                                  // myServices.data[index]["height"] == null
                                       ? const Center(
                                           child: CircularProgressIndicator(),
                                         )
@@ -126,7 +132,8 @@ class _HomePageState extends State<HomePage> {
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),
-                                  myServices.data[index]["width"] == null
+                                        ifItIsNull(myServices, index, "width")
+                                  // myServices.data[index]["width"] == null
                                       ? const Center(
                                           child: CircularProgressIndicator(),
                                         )
