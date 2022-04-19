@@ -9,7 +9,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:shutter_stock/constants/api.dart';
+import 'package:shutter_stock/helpers/hive_helper.dart';
 import 'package:shutter_stock/helpers/image_selector_helper.dart';
+import 'package:shutter_stock/helpers/image_selector_hive_helper.dart';
+import 'package:shutter_stock/hive/hive_model.dart';
 import 'package:shutter_stock/models/shutter_stock_model.dart';
 
 import '../constants/variables.dart';
@@ -19,9 +22,7 @@ class ShutterStockServices with ChangeNotifier {
       RefreshController(initialRefresh: true);
   List<Data> _items = [];
   Map<dynamic, dynamic> _data = {};
-
   Map<dynamic, dynamic> get data => _data;
-
   set setDataToCurrentData(Map<dynamic, dynamic> newData) {
     _data = newData;
   }
@@ -32,12 +33,13 @@ class ShutterStockServices with ChangeNotifier {
   final bool _load = false;
 
   List<Data> get items => _items;
-
   int get currentPage => _currentPage;
-
   int get totalPage => _totalPage;
-
   dynamic get currentResponse => _currentResponse;
+
+  set setCurrentPage(int newCurrentPage){
+    _currentPage = newCurrentPage;
+  }
 
   Future openBox() async {
     var dir = await getApplicationDocumentsDirectory();
@@ -54,10 +56,10 @@ class ShutterStockServices with ChangeNotifier {
     // _currentPage = 3;
     // print("6");
     await openBox();
-    if (isSelected) {
-      _currentPage = 3;
-    }
-    if (isRefresh) {
+    // if (isSelected) {
+    //   _currentPage = 3;
+    // }
+    if (isRefresh || isSelected) {
       // print("7");
       _currentPage = 3;
     } else {
@@ -93,6 +95,13 @@ class ShutterStockServices with ChangeNotifier {
         _currentResponse = responseJson;
         // print("13");
         await putData(responseJson.data!, selectedImage);
+
+
+        //new line
+        await addHiveModelBox(responseJson.data!, selectedImage);
+        //end new line
+
+
         // print("14");
         if (isRefresh) {
           // print("15");
@@ -102,6 +111,7 @@ class ShutterStockServices with ChangeNotifier {
           items.clear();
           items.addAll(responseJson.data!);
           await putData(responseJson.data!, selectedImage);
+          await addHiveModelBox(responseJson.data!, selectedImage);
           // print("17");
         }
         if (isLoading) {
@@ -158,5 +168,58 @@ class ShutterStockServices with ChangeNotifier {
       default:
         FromHiveDataBase.showPreviewImages(data);
     }
+  }
+
+  Future addHiveModelBox(List<Data> data, String selectedImage) async {
+    // await FromHiveDataBase.box!.clear();
+    await FromHiveDataBaseModel.box.clear();
+
+
+    // static showPreviewImages(List<Data> data) {
+    // final box = Boxes.getHiveModelBox();
+    // await box.clear();
+    switch (selectedImage) {
+      case preview:
+        FromHiveDataBaseModel.showPreviewImagesOfHive(data);
+
+        break;
+      case smallthumb:
+        FromHiveDataBaseModel.showSmallThumbImagesOfHive(data);
+
+        break;
+      case largethumb:
+        FromHiveDataBaseModel.showLargeThumbImagesOfHive(data);
+
+        break;
+      case hugethumb:
+        FromHiveDataBaseModel.showHugeThumbImagesOfHive(data);
+
+        break;
+      case preview1000:
+        FromHiveDataBaseModel.showPreview1000ImagesOfHive(data);
+
+        break;
+      case preview1500:
+        FromHiveDataBaseModel.showPreview1500ImagesOfHive(data);
+
+        break;
+      default:
+        FromHiveDataBaseModel.showPreviewImagesOfHive(data);
+    }
+    // for (var d in data) {
+    //   final model = HiveModel();
+    //   final inside = d.assets!;
+    //   // Map<String, dynamic> value = {
+    //     model.url = inside.preview!.url!;
+    //     model.height = inside.preview!.height!;
+    //     model.width = inside.preview!.width!;
+    //     model.description = d.description!;
+    //   // };
+      
+    //   box.add(model);
+    //   // box !.add(value);
+    // }
+  // }
+
   }
 }
