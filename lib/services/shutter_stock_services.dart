@@ -9,10 +9,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:shutter_stock/constants/api.dart';
-import 'package:shutter_stock/helpers/hive_helper.dart';
+// import 'package:shutter_stock/helpers/hive_helper.dart';
 import 'package:shutter_stock/helpers/image_selector_helper.dart';
 import 'package:shutter_stock/helpers/image_selector_hive_helper.dart';
-import 'package:shutter_stock/hive/hive_model.dart';
+// import 'package:shutter_stock/hive/hive_model.dart';
 import 'package:shutter_stock/models/shutter_stock_model.dart';
 
 import '../constants/variables.dart';

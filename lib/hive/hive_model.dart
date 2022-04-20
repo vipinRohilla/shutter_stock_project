@@ -14,4 +14,6 @@ class HiveModel extends HiveObject{
   @HiveField(3)
   late int width;
 
+  HiveModel({required this.url, required this.description, required this.height, required this.width});
+
 }

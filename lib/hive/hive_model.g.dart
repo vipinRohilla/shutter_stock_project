@@ -16,11 +16,12 @@ class HiveModelAdapter extends TypeAdapter<HiveModel> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return HiveModel()
-      ..url = fields[0] as String
-      ..description = fields[1] as String
-      ..height = fields[2] as int
-      ..width = fields[3] as int;
+    return HiveModel(
+      url: fields[0] as String,
+      description: fields[1] as String,
+      height: fields[2] as int,
+      width: fields[3] as int,
+    );
   }
 
   @override

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+// import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -74,7 +74,7 @@ class _HomePageState extends State<HomePage> {
             controller: myServices.refreshController,
             enablePullUp: true,
             onRefresh: () async {
-              print("refreshed");
+              // print("refreshed");
               final result = await myServices.fetchApi(isRefresh: true, selectedImage: image.imageQuality);
               if (result) {
                 myServices.refreshController.refreshCompleted();
@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
               }
             },
             onLoading: () async {
-              print("scrolling");
+              // print("scrolling");
               indexo++;
               final result =
                   await myServices.fetchApi(isLoading : true, selectedImage: image.imageQuality);

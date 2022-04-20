@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+// import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shutter_stock/helpers/hive_helper.dart';
 import 'package:shutter_stock/hive/hive_model.dart';
-import 'package:shutter_stock/services/shutter_stock_services.dart';
+// import 'package:shutter_stock/services/shutter_stock_services.dart';
 
 class TestingHive extends StatefulWidget {
   const TestingHive({ Key? key }) : super(key: key);
@@ -16,7 +16,7 @@ class _TestingHiveState extends State<TestingHive> {
 
 @override
   void initState() {
-    ShutterStockServices myServices = ShutterStockServices();
+    // ShutterStockServices myServices = ShutterStockServices();
     // myServices.fetchApi(isLoading: true);
     super.initState();
   }
@@ -27,7 +27,7 @@ class _TestingHiveState extends State<TestingHive> {
       valueListenable: Boxes.getHiveModelBox().listenable(),
       builder: (context, box, _){
         final hiveModelBox = box.values.toList().cast<HiveModel>();
-        print(hiveModelBox);
+        // print(hiveModelBox);
         return ListView.builder(
           itemCount: hiveModelBox.length,
           itemBuilder: (context, index) => 
@@ -36,7 +36,7 @@ class _TestingHiveState extends State<TestingHive> {
         )
         );
       },
-      child: Container(
+      child: const Center(
         child: Text("hello"),
       ),
     );
